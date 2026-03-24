@@ -58,6 +58,9 @@ export type GatewaySessionRow = {
   lastChannel?: SessionEntry["lastChannel"];
   lastTo?: string;
   lastAccountId?: string;
+  browser?: {
+    novncUrl?: string;
+  };
 };
 
 export type GatewayAgentRow = SharedGatewayAgentRow;

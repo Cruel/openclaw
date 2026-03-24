@@ -111,6 +111,23 @@ export function renderAgentOverview(params: {
           <div class="label">Skills Filter</div>
           <div>${skillFilter ? `${skillCount} selected` : "all skills"}</div>
         </div>
+        ${
+          agent.browser?.novncUrl
+            ? html`
+                <div class="agent-kv">
+                  <div class="label">Browser</div>
+                  <div>
+                    <a
+                      href="${agent.browser.novncUrl}"
+                      target="_blank"
+                      class="btn btn--sm btn--primary"
+                      style="text-decoration: none;"
+                    >Observe</a>
+                  </div>
+                </div>
+              `
+            : nothing
+        }
       </div>
 
       ${

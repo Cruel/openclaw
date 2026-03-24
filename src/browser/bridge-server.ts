@@ -66,9 +66,6 @@ export async function startBrowserBridgeServer(params: {
   resolveSandboxNoVncToken?: (token: string) => ResolvedNoVncObserver | null;
 }): Promise<BrowserBridge> {
   const host = params.host ?? "127.0.0.1";
-  if (!isLoopbackHost(host)) {
-    throw new Error(`bridge server must bind to loopback host (got ${host})`);
-  }
   const port = params.port ?? 0;
 
   const app = express();
@@ -114,8 +111,9 @@ export async function startBrowserBridgeServer(params: {
   });
   registerBrowserRoutes(app as unknown as BrowserRouteRegistrar, ctx);
 
+  const listenHost = params.host || "127.0.0.1";
   const server = await new Promise<Server>((resolve, reject) => {
-    const s = app.listen(port, host, () => resolve(s));
+    const s = app.listen(port, listenHost === "0.0.0.0" ? "0.0.0.0" : listenHost, () => resolve(s));
     s.once("error", reject);
   });
 
@@ -127,7 +125,7 @@ export async function startBrowserBridgeServer(params: {
 
   setBridgeAuthForPort(resolvedPort, { token: authToken, password: authPassword });
 
-  const baseUrl = `http://${host}:${resolvedPort}`;
+  const baseUrl = `http://${listenHost === "0.0.0.0" ? "127.0.0.1" : listenHost}:${resolvedPort}`;
   return { server, port: resolvedPort, baseUrl, state };
 }
 

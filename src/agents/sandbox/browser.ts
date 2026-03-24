@@ -65,6 +65,7 @@ async function waitForSandboxCdp(params: { hostIp?: string; cdpPort: number; tim
 function buildSandboxBrowserResolvedConfig(params: {
   controlPort: number;
   cdpPort: number;
+  noVncPort: number;
   headless: boolean;
   evaluateEnabled: boolean;
 }): ResolvedBrowserConfig {
@@ -89,6 +90,7 @@ function buildSandboxBrowserResolvedConfig(params: {
     defaultProfile: DEFAULT_OPENCLAW_BROWSER_PROFILE_NAME,
     extraArgs: [],
     ssrfPolicy: { dangerouslyAllowPrivateNetwork: true },
+    noVncPort: params.noVncPort,
     profiles: {
       [DEFAULT_OPENCLAW_BROWSER_PROFILE_NAME]: {
         cdpPort: params.cdpPort,
@@ -360,9 +362,11 @@ export async function ensureSandboxBrowser(params: {
       resolved: buildSandboxBrowserResolvedConfig({
         controlPort: 0,
         cdpPort: mappedCdp,
+        noVncPort: mappedNoVnc ?? 0,
         headless: params.cfg.browser.headless,
         evaluateEnabled: params.evaluateEnabled ?? DEFAULT_BROWSER_EVALUATE_ENABLED,
       }),
+      host: params.cfg.browser.hostIp,
       authToken: desiredAuthToken,
       authPassword: desiredAuthPassword,
       onEnsureAttachTarget,

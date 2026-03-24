@@ -37,6 +37,8 @@ export type ResolvedBrowserConfig = {
   profiles: Record<string, BrowserProfileConfig>;
   ssrfPolicy?: SsrFPolicy;
   extraArgs: string[];
+  noVncPort: number;
+  hostIp?: string;
 };
 
 export type ResolvedBrowserProfile = {
@@ -300,6 +302,8 @@ export function resolveBrowserConfig(
     profiles,
     ssrfPolicy,
     extraArgs,
+    noVncPort: cfg?.noVncPort ?? 6080,
+    hostIp: cfg?.hostIp,
   };
 }
 

@@ -47,6 +47,11 @@ import {
   resolveAvatarMime,
 } from "../shared/avatar-policy.js";
 import { normalizeSessionDeliveryFields } from "../utils/delivery-context.js";
+import { BROWSER_BRIDGES } from "../agents/sandbox/browser-bridges.js";
+import {
+  buildNoVncObserverTokenUrl,
+  issueNoVncObserverToken,
+} from "../agents/sandbox/novnc-auth.js";
 import { estimateUsageCost, resolveModelCostConfig } from "../utils/usage-format.js";
 import {
   readLatestSessionUsageFromTranscript,
@@ -567,10 +572,22 @@ export function listAgentsForGateway(cfg: OpenClawConfig): {
   }
   const agents = agentIds.map((id) => {
     const meta = configuredById.get(id);
+    const bridge = BROWSER_BRIDGES.get(id);
+    const browser = bridge
+      ? {
+          novncUrl: buildNoVncObserverTokenUrl(
+            bridge.bridge.baseUrl,
+            issueNoVncObserverToken({
+              noVncPort: bridge.bridge.state.resolved.noVncPort,
+            }),
+          ),
+        }
+      : undefined;
     return {
       id,
       name: meta?.name,
       identity: meta?.identity,
+      browser,
     };
   });
   return { defaultId, mainKey, scope, agents };
@@ -1131,6 +1148,19 @@ export function buildGatewaySessionRow(params: {
     }
   }
 
+  const bridge = BROWSER_BRIDGES.get(key) ?? BROWSER_BRIDGES.get(sessionAgentId);
+  const browser = bridge
+    ? {
+        novncUrl: buildNoVncObserverTokenUrl(
+          bridge.bridge.baseUrl,
+          issueNoVncObserverToken({
+            noVncPort: bridge.bridge.state.resolved.noVncPort,
+            // Re-issuing a token for the bridge which already knows its sandbox port
+          }),
+        ),
+      }
+    : undefined;
+
   return {
     key,
     spawnedBy: entry?.spawnedBy,
@@ -1160,6 +1190,7 @@ export function buildGatewaySessionRow(params: {
     totalTokensFresh,
     estimatedCostUsd,
     status: subagentRun ? subagentStatus : entry?.status,
+    browser,
     startedAt: subagentRun ? subagentStartedAt : entry?.startedAt,
     endedAt: subagentRun ? subagentEndedAt : entry?.endedAt,
     runtimeMs: subagentRun ? subagentRuntimeMs : entry?.runtimeMs,

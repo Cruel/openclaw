@@ -10,6 +10,9 @@ export type GatewayAgentRow = {
   id: string;
   name?: string;
   identity?: GatewayAgentIdentity;
+  browser?: {
+    novncUrl?: string;
+  };
 };
 
 export type SessionsListResultBase<TDefaults, TRow> = {

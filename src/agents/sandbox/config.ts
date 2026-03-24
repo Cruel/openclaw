@@ -156,6 +156,7 @@ export function resolveSandboxBrowserConfig(params: {
       agentBrowser?.autoStartTimeoutMs ??
       globalBrowser?.autoStartTimeoutMs ??
       DEFAULT_SANDBOX_BROWSER_AUTOSTART_TIMEOUT_MS,
+    hostIp: agentBrowser?.hostIp ?? globalBrowser?.hostIp,
     binds: bindsConfigured ? binds : undefined,
   };
 }

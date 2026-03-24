@@ -148,7 +148,12 @@ export function renderOverviewCards(props: OverviewCardsProps) {
               (s) => html`
                 <li class="ov-recent__row">
                   <span class="ov-recent__key">${blurDigits(s.displayName || s.label || s.key)}</span>
-                  <span class="ov-recent__model">${s.model ?? ""}</span>
+                  <span class="ov-recent__model">
+                    ${s.model ?? ""}
+                    ${s.browser?.novncUrl
+                      ? html`<a href="${s.browser.novncUrl}" target="_blank" class="ov-recent__browser-link">Observe</a>`
+                      : nothing}
+                  </span>
                   <span class="ov-recent__time">${s.updatedAt ? formatRelativeTimestamp(s.updatedAt) : ""}</span>
                 </li>
               `,

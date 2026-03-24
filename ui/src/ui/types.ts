@@ -400,6 +400,9 @@ export type GatewaySessionRow = {
   model?: string;
   modelProvider?: string;
   contextTokens?: number;
+  browser?: {
+    novncUrl?: string;
+  };
 };
 
 export type SessionsListResult = SessionsListResultBase<GatewaySessionsDefaults, GatewaySessionRow>;

@@ -68,4 +68,11 @@ export type BrowserConfig = {
    * Example: ["--window-size=1920,1080", "--disable-infobars"]
    */
   extraArgs?: string[];
+  /** Port for the noVNC observer (if enabled). Default: 6080 */
+  noVncPort?: number;
+  /**
+   * Optional host IP for browser port mapping (default: 127.0.0.1).
+   * Set to 0.0.0.0 to make it accessible to the network.
+   */
+  hostIp?: string;
 };

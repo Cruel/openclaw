@@ -506,6 +506,11 @@ function renderRow(
               ? html`<span class="muted session-key-display-name">${displayName}</span>`
               : nothing
           }
+          ${
+            row.browser?.novncUrl
+              ? html`<a href="${row.browser.novncUrl}" target="_blank" class="session-browser-link" title="Observe browser session" style="margin-left: 8px; color: var(--color-accent);">${icons.monitor}</a>`
+              : nothing
+          }
         </div>
       </td>
       <td>
