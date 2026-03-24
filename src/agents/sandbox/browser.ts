@@ -38,9 +38,10 @@ import { appendWorkspaceMountArgs } from "./workspace-mounts.js";
 const HOT_BROWSER_WINDOW_MS = 5 * 60 * 1000;
 const CDP_SOURCE_RANGE_ENV_KEY = "OPENCLAW_BROWSER_CDP_SOURCE_RANGE";
 
-async function waitForSandboxCdp(params: { cdpPort: number; timeoutMs: number }): Promise<boolean> {
+async function waitForSandboxCdp(params: { hostIp?: string; cdpPort: number; timeoutMs: number }): Promise<boolean> {
   const deadline = Date.now() + Math.max(0, params.timeoutMs);
-  const url = `http://127.0.0.1:${params.cdpPort}/json/version`;
+  const host = params.hostIp && params.hostIp !== "0.0.0.0" ? params.hostIp : "127.0.0.1";
+  const url = `http://${host}:${params.cdpPort}/json/version`;
   while (Date.now() < deadline) {
     try {
       const ctrl = new AbortController();
@@ -159,6 +160,7 @@ export async function ensureSandboxBrowser(params: {
       noVncPort: params.cfg.browser.noVncPort,
       headless: params.cfg.browser.headless,
       enableNoVnc: params.cfg.browser.enableNoVnc,
+      hostIp: params.cfg.browser.hostIp,
       cdpSourceRange,
     },
     securityEpoch: SANDBOX_BROWSER_SECURITY_HASH_EPOCH,
@@ -246,9 +248,10 @@ export async function ensureSandboxBrowser(params: {
         args.push("-v", bind);
       }
     }
-    args.push("-p", `127.0.0.1::${params.cfg.browser.cdpPort}`);
+    const bindIp = params.cfg.browser.hostIp ?? "127.0.0.1";
+    args.push("-p", `${bindIp}::${params.cfg.browser.cdpPort}`);
     if (noVncEnabled) {
-      args.push("-p", `127.0.0.1::${params.cfg.browser.noVncPort}`);
+      args.push("-p", `${bindIp}::${params.cfg.browser.noVncPort}`);
     }
     args.push("-e", `OPENCLAW_BROWSER_HEADLESS=${params.cfg.browser.headless ? "1" : "0"}`);
     args.push("-e", `OPENCLAW_BROWSER_ENABLE_NOVNC=${params.cfg.browser.enableNoVnc ? "1" : "0"}`);
@@ -336,12 +339,17 @@ export async function ensureSandboxBrowser(params: {
             await execDocker(["start", containerName]);
           }
           const ok = await waitForSandboxCdp({
+            hostIp: params.cfg.browser.hostIp,
             cdpPort: mappedCdp,
             timeoutMs: params.cfg.browser.autoStartTimeoutMs,
           });
           if (!ok) {
+            const host =
+              params.cfg.browser.hostIp && params.cfg.browser.hostIp !== "0.0.0.0"
+                ? params.cfg.browser.hostIp
+                : "127.0.0.1";
             throw new Error(
-              `Sandbox browser CDP did not become reachable on 127.0.0.1:${mappedCdp} within ${params.cfg.browser.autoStartTimeoutMs}ms.`,
+              `Sandbox browser CDP did not become reachable on ${host}:${mappedCdp} within ${params.cfg.browser.autoStartTimeoutMs}ms.`,
             );
           }
         }

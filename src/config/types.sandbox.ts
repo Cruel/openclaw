@@ -75,6 +75,11 @@ export type SandboxBrowserSettings = {
   headless?: boolean;
   enableNoVnc?: boolean;
   /**
+   * Optional host IP for browser port mapping (default: 127.0.0.1).
+   * Set to 0.0.0.0 to make it accessible to the network.
+   */
+  hostIp?: string;
+  /**
    * Allow sandboxed sessions to target the host browser control server.
    * Default: false.
    */

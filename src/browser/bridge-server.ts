@@ -49,7 +49,7 @@ function buildNoVncBootstrapHtml(params: ResolvedNoVncObserver): string {
 <body>
   <p>Opening sandbox observer...</p>
   <script>
-    const target = ${encodedTarget};
+    const target = ${encodedTarget}.replace('127.0.0.1', window.location.hostname);
     window.location.replace(target);
   </script>
 </body>
