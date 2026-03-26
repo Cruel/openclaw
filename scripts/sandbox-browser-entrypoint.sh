@@ -66,6 +66,13 @@ CHROME_ARGS+=(
   "--metrics-recording-only"
 )
 
+# Add extra args from environment if provided (e.g. for --ignore-certificate-errors)
+if [[ -n "${OPENCLAW_BROWSER_EXTRA_ARGS:-}" ]]; then
+  # Split string into array to handle multiple flags correctly
+  IFS=' ' read -r -a EXTRA_ARGS <<< "${OPENCLAW_BROWSER_EXTRA_ARGS}"
+  CHROME_ARGS+=("${EXTRA_ARGS[@]}")
+fi
+
 DISABLE_GRAPHICS_FLAGS_LOWER="${DISABLE_GRAPHICS_FLAGS,,}"
 if [[ "${DISABLE_GRAPHICS_FLAGS_LOWER}" == "1" || "${DISABLE_GRAPHICS_FLAGS_LOWER}" == "true" || "${DISABLE_GRAPHICS_FLAGS_LOWER}" == "yes" || "${DISABLE_GRAPHICS_FLAGS_LOWER}" == "on" ]]; then
   CHROME_ARGS+=(
